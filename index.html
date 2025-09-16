@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>STEM Schools Egypt</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STEM Schools</title>
+  <link rel="stylesheet" href="leaflet.css">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="dist/leaflet.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="leaflet.js"></script>
+  <script src="https://kit.fontawesome.com/a2e0e6ad4b.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <header>
     <div>
-      <h1 id="title">STEM Schools Nearby</h1>
-      <small id="madeby">made with ❤️ by ZIKO</small>
+      <h1 id="title"></h1>
+      <small id="madeby"></small>
     </div>
     <select id="lang-select">
       <option value="en">English</option>
-      <option value="ar">المصرى</option>
+      <option value="ar">Arabic</option>
     </select>
   </header>
 
@@ -25,9 +26,8 @@
     <div id="schools-list"></div>
   </main>
 
-  <button id="locate-btn" class="locate-btn">📍 <span id="locate-text">Locate me</span></button>
+  <button class="locate-btn" id="locate-btn"><span id="locate-text"></span></button>
 
-  <script src="dist/leaflet.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
