@@ -74,10 +74,10 @@ main {
   text-decoration: none;
 }
 
-/* زرار مسافة السواقة */
+/* الزرين جنب بعض */
 .school-item button {
-  display: block;              /* ياخد صف لوحده */
-  width: 100%;                 /* يعرض على كل عرض الكارت */
+  display: inline-block;
+  width: 48%;
   margin-top: 6px;
   padding: 8px;
   background: #007bff;
@@ -87,6 +87,9 @@ main {
   font-size: 0.9rem;
   cursor: pointer;
   text-align: center;
+}
+.school-item button + button {
+  margin-left: 4%;
 }
 
 .school-item button:hover {
@@ -111,9 +114,12 @@ body[dir="rtl"] {
   direction: rtl;
   text-align: right;
 }
-
 body[dir="rtl"] header {
   flex-direction: row-reverse;
+}
+body[dir="rtl"] .school-item button + button {
+  margin-left: 0;
+  margin-right: 4%;
 }
 
 /* تحسين المظهر على الشاشات الصغيرة */
