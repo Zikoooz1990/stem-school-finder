@@ -1,7 +1,4 @@
-// Improved script.js -- fixed distance logic, coord validation and optional driving distances via OSRM
-
 const schoolsData = [
-  /* Paste your schools array here (unchanged) */
   {
     name: "STEM High School – Maadi",
     address: "X876+FH9, Maadi as Sarayat Al Gharbeyah, Tura, Cairo Governorate 4064145",
@@ -58,7 +55,7 @@ const schoolsData = [
   },
   {
     name: "STEM High School – Sers El Laian (Menofia)",
-    address: "CXV5+8HH, Madinet SERS Al Layanah, Sers El Laian City, Menofia Governorate 6060084",
+    address: "CXV5+8HH, Madinet SERS Al Layanah, Sers El Layan City, Menofia Governorate 6060084",
     lat: 30.44331327472523,
     lng: 30.959007953548515
   },
@@ -130,85 +127,19 @@ const schoolsData = [
   }
 ];
 
-let map;
-let CURRENT_USER_LOCATION = null;
-
-// Helpers
-function toRadians(deg) {
-  return deg * Math.PI / 180;
-}
-
-function isValidEgyptCoord(lat, lng) {
-  // Loose bounding box for Egypt
-  return lat >= 20 && lat <= 33 && lng >= 24 && lng <= 37.5;
-}
-
-// Haversine (great-circle) distance in kilometers
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  if (
-    typeof lat1 !== "number" ||
-    typeof lon1 !== "number" ||
-    typeof lat2 !== "number" ||
-    typeof lon2 !== "number" ||
-    isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)
-  ) {
-    return Infinity;
-  }
-
-  const R = 6371; // km
-  const dLat = toRadians(lat2 - lat1);
-  const dLon = toRadians(lon2 - lon1);
-  const a = Math.sin(dLat / 2) ** 2 +
-            Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
-            Math.sin(dLon / 2) ** 2;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
-// Try to fix swapped coords (lat/lng) if they appear outside Egypt bounds
-function normalizeSchoolCoords(school) {
-  if (!isValidEgyptCoord(school.lat, school.lng)) {
-    // try swap
-    if (isValidEgyptCoord(school.lng, school.lat)) {
-      // swap and log to console
-      console.warn(`Swapping lat/lng for ${school.name} because they were outside Egypt bounds.`);
-      const tmp = school.lat;
-      school.lat = school.lng;
-      school.lng = tmp;
-      school._coordsFixed = true;
-    } else {
-      console.warn(`Coordinates for ${school.name} look invalid or outside Egypt bounds:`, school.lat, school.lng);
-      school._coordsFixed = false;
-    }
-  } else {
-    school._coordsFixed = true;
-  }
-  return school;
-}
-
-// Fetch driving distance from OSRM (returns km) - on demand
 async function fetchDrivingDistance(userLoc, school) {
-  // OSRM expects lon,lat pairs
   const base = 'https://router.project-osrm.org/route/v1/driving';
   const coords = `${userLoc.lng},${userLoc.lat};${school.lng},${school.lat}`;
   const url = `${base}/${coords}?overview=false&alternatives=false&steps=false`;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('OSRM request failed');
-    const json = await res.json();
-    if (json && json.routes && json.routes.length > 0) {
-      const meters = json.routes[0].distance;
-      return meters / 1000; // km
-    } else {
-      throw new Error('No route found');
-    }
-  } catch (err) {
-    console.warn('OSRM error or blocked by CORS:', err);
-    throw err;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('OSRM request failed');
+  const json = await res.json();
+  if (json && json.routes && json.routes.length > 0) {
+    return json.routes[0].distance / 1000; // km
   }
+  throw new Error('No route found');
 }
 
-// get user location with Promise
 function getUserLocation() {
   return new Promise((resolve, reject) => {
     if (navigator.geolocation) {
@@ -217,91 +148,57 @@ function getUserLocation() {
         err => reject(err),
         { maximumAge: 60_000, timeout: 10_000 }
       );
-    } else {
-      reject(new Error("Geolocation not supported"));
-    }
+    } else reject(new Error("Geolocation not supported"));
   });
 }
 
 async function init() {
   const schoolsListDiv = document.getElementById("schools-list");
-  // default to Cairo center if user denies
-  let userLocation = { lat: 30.0444, lng: 31.2357 };
-  let usedDefault = true;
-
+  let userLocation = { lat: 30.0444, lng: 31.2357 }; // default Cairo
   try {
-    const loc = await getUserLocation();
-    userLocation = loc;
-    usedDefault = false;
-    CURRENT_USER_LOCATION = loc;
+    userLocation = await getUserLocation();
   } catch (err) {
-    console.warn("Couldn't get user location, using default center (Cairo).", err);
-    CURRENT_USER_LOCATION = userLocation;
-    schoolsListDiv.innerHTML = `<p>Couldn't get your location (or permission denied). Showing distances from Cairo center (straight-line). If you want driving distances, click the 'Driving distance' button for a school.</p>`;
+    schoolsListDiv.innerHTML = `<p>Couldn't get your location. Showing driving distances from Cairo center.</p>`;
   }
 
-  // Initialize the Leaflet map
-  map = L.map('map').setView([userLocation.lat, userLocation.lng], 7);
+  // Map
+  const map = L.map('map').setView([userLocation.lat, userLocation.lng], 7);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
 
-  // mark user
-  L.marker([userLocation.lat, userLocation.lng]).addTo(map).bindPopup(usedDefault ? "Default center (Cairo)" : "Your Location").openPopup();
+  L.marker([userLocation.lat, userLocation.lng]).addTo(map)
+    .bindPopup("Your Location").openPopup();
 
-  // normalize coords and compute distances
-  schoolsData.forEach(school => {
-    normalizeSchoolCoords(school);
-    school.distance = calculateDistance(userLocation.lat, userLocation.lng, school.lat, school.lng);
-    // store a Google Maps quick link
+  // Compute driving distance for each school
+  for (const school of schoolsData) {
     school.gm_link = `https://www.google.com/maps/search/?api=1&query=${school.lat},${school.lng}`;
-  });
-
-  // sort by numeric distance
-  schoolsData.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
-
-  // clear and render
-  schoolsListDiv.innerHTML = '';
-  schoolsData.forEach((school, idx) => {
-    // add marker for each school
-    if (map) {
-      L.marker([school.lat, school.lng]).addTo(map).bindPopup(`<b>${school.name}</b><br>${school.address}`);
+    try {
+      school.distance = await fetchDrivingDistance(userLocation, school);
+    } catch {
+      school.distance = Infinity;
     }
+  }
 
-    // create item
-    const schoolItem = document.createElement("div");
-    schoolItem.className = "school-item";
+  // sort by driving distance
+  schoolsData.sort((a, b) => a.distance - b.distance);
 
-    // distance text (straight-line)
-    const distanceText = isFinite(school.distance) ? `${school.distance.toFixed(2)} km (straight-line)` : 'Distance unknown';
+  // render
+  schoolsListDiv.innerHTML = '';
+  schoolsData.forEach(school => {
+    L.marker([school.lat, school.lng]).addTo(map)
+      .bindPopup(`<b>${school.name}</b><br>${school.address}<br>${school.distance !== Infinity ? school.distance.toFixed(2) + ' km driving' : 'Distance unknown'}`);
 
-    schoolItem.innerHTML = `
+    const div = document.createElement('div');
+    div.className = 'school-item';
+    div.innerHTML = `
       <h3>${school.name}</h3>
-      <p>Address: ${school.address}</p>
-      <p id="dist-${idx}">Distance: ${distanceText}</p>
-      <p>
-        <a href="${school.gm_link}" target="_blank" rel="noopener">Open in Google Maps</a>
-        &nbsp;|&nbsp;
-        <button id="drive-btn-${idx}">Get driving distance</button>
-      </p>
+      <p>${school.address}</p>
+      <p>Distance: ${school.distance !== Infinity ? school.distance.toFixed(2) + ' km (driving)' : 'Distance unknown'}</p>
+      <p><a href="${school.gm_link}" target="_blank" rel="noopener">Open in Google Maps</a></p>
     `;
-
-    schoolsListDiv.appendChild(schoolItem);
-
-    // attach driving distance handler
-    const btn = document.getElementById(`drive-btn-${idx}`);
-    btn.addEventListener('click', async () => {
-      const distEl = document.getElementById(`dist-${idx}`);
-      distEl.textContent = 'Distance: calculating driving distance...';
-      try {
-        const driveKm = await fetchDrivingDistance(CURRENT_USER_LOCATION, school);
-        distEl.textContent = `Distance: ${driveKm.toFixed(2)} km (driving) — ${school.distance.toFixed(2)} km (straight-line)`;
-      } catch (err) {
-        distEl.textContent = `Distance: ${school.distance ? school.distance.toFixed(2) + ' km (straight-line)' : 'unknown'} (driving distance unavailable)`;
-      }
-    });
+    schoolsListDiv.appendChild(div);
   });
 }
 
-// start
 init();
