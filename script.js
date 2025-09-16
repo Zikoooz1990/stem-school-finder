@@ -1,0 +1,225 @@
+// Data for STEM schools in Egypt
+const schoolsData = [
+  {
+    name: "STEM High School – Maadi",
+    address: "X876+FH9, Maadi as Sarayat Al Gharbeyah, Tura, Cairo Governorate 4064145",
+    lat: 29.963685859495783,
+    lng: 31.311470067023386
+  },
+  {
+    name: "STEM High School – Nasr City",
+    address: "2CHG+4RM, Nasr City, Cairo Governorate 4731130",
+    lat: 30.02886071407647,
+    lng: 31.426460323294073
+  },
+  {
+    name: "STEM High School for Boys – 6th of October",
+    address: "W3MF+64 October Gardens, First 6th of October, Giza Governorate 3283010",
+    lat: 29.93308155892515,
+    lng: 31.07267764983385
+  },
+  {
+    name: "STEM High School – Al Wegieh (6th of October)",
+    address: "Al Wegieh Center, 6th of October City, Giza Governorate",
+    lat: 29.961936869971872,
+    lng: 30.902121195858626
+  },
+  {
+    name: "STEM High School – Borg El Arab (Alexandria)",
+    address: "VH9P+HMM, Hod Sakrah WA Abu Hamad, Borg El Arab, Alexandria Governorate 5221250",
+    lat: 30.86896617451884,
+    lng: 29.5866984535659
+  },
+  {
+    name: "STEM High School – Luxor (Red Sea)",
+    address: "PQP6+WFC, Tieba City Unnamed Road, Red Sea Governorate, Luxor City, Luxor",
+    lat: 25.736938426710903,
+    lng: 32.76149701843059
+  },
+  {
+    name: "STEM High School – Dakahlia",
+    address: "CGPC+C43, International Coastal Rd, Al Hafir WA Al Amal, Belqas, Dakahlia Governorate 7730203",
+    lat: 31.436032328342286,
+    lng: 31.520290395918593
+  },
+  {
+    name: "STEM High School – Al-Sharqia (Zagazig)",
+    address: "HGP9+XMW, Harayah Raznah, Zagazig, Al-Sharqia Governorate 7124105",
+    lat: 30.58748543870247,
+    lng: 31.519180038213037
+  },
+  {
+    name: "STEM High School – Kafr El-Sheikh",
+    address: "el drayeb street, Qism Kafr El-Shaikh, Kafr Al Sheikh First, Kafr El-Sheikh Governorate 6860581",
+    lat: 31.11382951817345,
+    lng: 30.954409026587758
+  },
+  {
+    name: "STEM High School – Sers El Laian (Menofia)",
+    address: "CXV5+8HH, Madinet SERS Al Layanah, Sers El Laian City, Menofia Governorate 6060084",
+    lat: 30.44331327472523,
+    lng: 30.959007953548515
+  },
+  {
+    name: "STEM High School – Sadat City (Menofia)",
+    address: "9GJW+PM, Sadat City, Menofia Governorate 6011521",
+    lat: 30.3818088747554,
+    lng: 30.546622009369415
+  },
+  {
+    name: "STEM High School – Ismailia",
+    address: "Security Forces Complex, Educational Complex, Ismailia Desert Rd, 41511",
+    lat: 30.62618167463584,
+    lng: 32.22689992472066
+  },
+  {
+    name: "STEM High School – Obour",
+    address: "Obour, Al-Qalyubia Governorate 6360191",
+    lat: 30.2263347584288,
+    lng: 31.44888811490449
+  },
+  {
+    name: "STEM High School – Faiyum",
+    address: "Behind New Social Housing Buildings, Al Faiyum Al Gadida City, Faiyum Governorate",
+    lat: 29.21625487535105,
+    lng: 30.868401953499752
+  },
+  {
+    name: "STEM High School – Assiut",
+    address: "53PF+4XP, Assiut El Wady El Gedid Road, Al Bourah, Asyut, Assiut Governorate",
+    lat: 27.184882189095735,
+    lng: 31.074990066917273
+  },
+  {
+    name: "STEM High School – New Minya",
+    address: "4V87+7RQ, Al Zahir Al Sahrawi, New Minya, Minya Governorate",
+    lat: 28.115702075950917,
+    lng: 30.864623995787007
+  },
+  {
+    name: "STEM High School – Beni Suef",
+    address: "Unnamed Road, Third Neighborhood, Beni Suef New City, Beni Suef Governorate",
+    lat: 29.02065431190559,
+    lng: 31.099411524656915
+  },
+  {
+    name: "STEM High School – Hurghada (Red Sea)",
+    address: "7PQJ+XCR, Mubarak 11, Street of STEM School, Hurghada 2, Red Sea Governorate, Egypt",
+    lat: 27.290545241784063,
+    lng: 33.73113602459167
+  },
+  {
+    name: "STEM High School – Sohag",
+    address: "CMV8+4GG, Sohag Al Gadida City, Sohag Governorate, Egypt",
+    lat: 26.442810283308162,
+    lng: 31.66632969572585
+  },
+  {
+    name: "STEM High School – Qena",
+    address: "Unnamed Road, New Qena City, Qena Governorate, Egypt",
+    lat: 26.244772222719977,
+    lng: 32.74068399571885
+  },
+  {
+    name: "STEM High School – Tanta (Gharbia)",
+    address: "Q2C8+MQJ, Kafr Abou Dawoud, Tanta, Gharbia Governorate, Egypt",
+    lat: 30.771719174565504,
+    lng: 31.016861338220636
+  }
+];
+
+let map;
+
+// This function gets the user's location using the browser's Geolocation API
+function getUserLocation() {
+    return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    resolve({
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    });
+                },
+                (error) => {
+                    reject(new Error("Geolocation is denied. Please enable location services."));
+                }
+            );
+        } else {
+            reject(new Error("Geolocation is not supported by this browser."));
+        }
+    });
+}
+
+// This function calculates the distance between two points on Earth
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius of the earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+}
+
+// The main function that orchestrates everything
+async function init() {
+    try {
+        const userLocation = await getUserLocation();
+        
+        // Initialize the Leaflet map and set the view
+        map = L.map('map').setView([userLocation.lat, userLocation.lng], 12);
+
+        // Add the OpenStreetMap tile layer (the actual map image)
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // Add a marker for the user's location
+        L.marker([userLocation.lat, userLocation.lng])
+            .addTo(map)
+            .bindPopup("Your Location")
+            .openPopup();
+
+        // Calculate and sort the schools by distance
+        schoolsData.forEach(school => {
+            school.distance = calculateDistance(
+                userLocation.lat,
+                userLocation.lng,
+                school.lat,
+                school.lng
+            );
+        });
+        schoolsData.sort((a, b) => a.distance - b.distance);
+
+        // Display schools on the map and in the list
+        const schoolsListDiv = document.getElementById("schools-list");
+        schoolsListDiv.innerHTML = ''; // Clear loading message
+
+        schoolsData.forEach(school => {
+            // Add a marker to the map for each school
+            L.marker([school.lat, school.lng])
+                .addTo(map)
+                .bindPopup(`<b>${school.name}</b><br>${school.address}`);
+
+            // Create and add the list item for each school
+            const schoolItem = document.createElement("div");
+            schoolItem.className = "school-item";
+            schoolItem.innerHTML = `
+                <h3>${school.name}</h3>
+                <p>Address: ${school.address}</p>
+                <p>Distance: ${school.distance.toFixed(2)} km</p>
+            `;
+            schoolsListDiv.appendChild(schoolItem);
+        });
+
+    } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("schools-list").innerHTML = `<p>Error: ${error.message}</p>`;
+    }
+}
+
+// Run the main function when the page loads
+init();
