@@ -72,7 +72,8 @@ main {
   font-size: 0.9rem;
 }
 
-.school-item a {
+.school-item a,
+.school-item button {
   display: inline-block;
   margin-top: 0.5rem;
   padding: 0.4rem 0.8rem;
@@ -81,9 +82,12 @@ main {
   border-radius: 6px;
   text-decoration: none;
   font-size: 0.8rem;
+  border: none;
+  cursor: pointer;
 }
 
-.school-item a:hover {
+.school-item a:hover,
+.school-item button:hover {
   background: #1d5fbf;
 }
 
