@@ -1,39 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>STEM Schools</title>
-
-  <!-- Leaflet من الفولدر المحلى dist -->
   <link rel="stylesheet" href="dist/leaflet.css">
-  <script src="dist/leaflet.js"></script>
-
-  <!-- Font Awesome من الفولدر المحلى dist -->
-  <link rel="stylesheet" href="dist/fontawesome.min.css">
-
-  <!-- CSS بتاعنا -->
   <link rel="stylesheet" href="style.css">
+  <script src="dist/leaflet.js"></script>
 </head>
 <body>
   <header>
-    <div>
-      <h1 id="title"></h1>
-      <small id="madeby"></small>
+    <h1 id="title">STEM Schools Nearby</h1>
+    <p id="madeby">made with ❤️ by ZIKO</p>
+    <div class="controls">
+      <button id="locate-btn" class="btn">📍 <span id="locate-text">Locate me</span></button>
+      <select id="lang-select">
+        <option value="en">English</option>
+        <option value="ar">العربية</option>
+      </select>
     </div>
-    <select id="lang-select">
-      <option value="en">English</option>
-      <option value="ar">Arabic</option>
-    </select>
   </header>
-
   <main>
     <div id="map"></div>
     <div id="schools-list"></div>
   </main>
-
-  <button class="locate-btn" id="locate-btn"><span id="locate-text"></span></button>
-
   <script src="script.js"></script>
 </body>
 </html>
