@@ -142,5 +142,12 @@ document.getElementById('locate-btn').addEventListener('click',async()=>{
     window.map.setView([window.userLoc.lat,window.userLoc.lng],12);
   }catch{alert(currentLang==='ar'?'تعذر تحديد موقعك':'Could not get location');}
 });
-document.getElementById('lang-select').addEventListener('change',e=>{currentLang=e.target.value;window.map.remove();init();});
-init();
+
+document.getElementById('lang-select').addEventListener('change',e=>{
+  currentLang=e.target.value;
+  window.map.remove();
+  init();
+});
+
+// التعديل المهم: نستنى تحميل الصفحة بالكامل
+window.addEventListener('load', init);
