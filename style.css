@@ -69,8 +69,22 @@ main{
 .school-item p{margin:5px 0;font-size:0.9rem;}
 .school-item a{color:#007bff;text-decoration:none;}
 .school-item a:hover{text-decoration:underline;}
-@media(max-width:768px){
-  main{flex-direction:column;height:auto;}
-  #map{height:300px;}
-  #schools-list{height:auto;}
+@media (max-width:768px){
+  main{
+    flex-direction:column;
+    height:auto;
+  }
+  #map{
+    width:100%;
+    height:350px; /* ارتفاع واضح للخرطة على الموبايل */
+  }
+  #schools-list{
+    width:100%;
+    max-height:calc(100vh - 350px - 150px); /* يملأ باقى الشاشة */
+    overflow-y:auto;
+  }
+  .btn{
+    width:100%; /* الأزرار تبقى عريضة على الموبايل */
+    justify-content:center;
+  }
 }
