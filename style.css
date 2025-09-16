@@ -26,6 +26,7 @@ main {
 #map {
   flex: 2;
   height: 100%;
+  min-height: 400px; /* مهم علشان الخريطة تبان */
 }
 
 #schools-container {
