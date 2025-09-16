@@ -103,11 +103,13 @@ async function renderSchools(){
     list.appendChild(card);
     document.getElementById(`drive-${i}`).addEventListener('click',async()=>{
       const el=document.getElementById(`dist-${i}`);
-      el.textContent='...';
+      el.innerHTML='<div style="background:#007bff;color:#fff;padding:6px;border-radius:4px;display:inline-block;">…</div>';
       try{
         const km=await fetchDrivingDistance(window.userLoc,s);
-        el.textContent=`${t('distance')}: ${km.toFixed(2)} km (driving)`;
-      }catch{el.textContent=`${t('distance')}: ${s.distance.toFixed(2)} km`;}
+        el.innerHTML=`<div style="background:#007bff;color:#fff;padding:6px;border-radius:4px;display:inline-block;">${t('distance')}: ${km.toFixed(2)} km (driving)</div>`;
+      }catch{
+        el.innerHTML=`<div style="background:#007bff;color:#fff;padding:6px;border-radius:4px;display:inline-block;">${t('distance')}: ${s.distance.toFixed(2)} km</div>`;
+      }
     });
   });
 }
