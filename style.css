@@ -32,7 +32,7 @@ header small {
 
 main {
   display: flex;
-  flex-direction: row;
+  flex-direction: row; /* دايما صفين على الكمبيوتر */
   height: calc(100vh - 80px);
 }
 
@@ -79,7 +79,7 @@ main {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  width: 48%;
+  width: 48%; /* على الكمبيوتر */
   margin-top: 6px;
   padding: 8px;
   background: linear-gradient(135deg, #007bff, #0056b3);
@@ -134,7 +134,7 @@ body[dir="rtl"] header {
 /* تحسين المظهر على الشاشات الصغيرة */
 @media (max-width: 768px) {
   main {
-    flex-direction: column;
+    flex-direction: column; /* على الموبايل الخريطة فوق والقائمة تحت */
   }
   #map {
     height: 300px;
@@ -149,6 +149,7 @@ body[dir="rtl"] header {
   .school-item h3 {
     font-size: 0.95rem;
   }
+  /* على الموبايل كل زر ياخد سطر كامل */
   .school-item .btn {
     width: 100%;
     margin-left: 0 !important;
