@@ -1,4 +1,27 @@
-// === Egypt STEM Schools Data ===
+// === Translations ===
+const translations = {
+  en: {
+    title: "STEM Schools Nearby",
+    address: "Address",
+    distance: "Distance",
+    driving: "Get driving distance",
+    openMap: "Open in Google Maps",
+    yourLoc: "Your Location"
+  },
+  ar: {
+    title: "مدارس المتفوقين القريبة",
+    address: "العنوان",
+    distance: "المسافة",
+    driving: "احسب مسافة القيادة",
+    openMap: "افتح في خرائط جوجل",
+    yourLoc: "موقعك"
+  }
+};
+
+let currentLang = 'en';
+function t(key){ return translations[currentLang][key] || key; }
+
+// === Data ===
 const schoolsData = [
   {name:"STEM High School – Maadi",address:"X876+FH9, Maadi as Sarayat Al Gharbeyah, Tura, Cairo Governorate 4064145",lat:29.963685859495783,lng:31.311470067023386},
   {name:"STEM High School – Nasr City",address:"2CHG+4RM, Nasr City, Cairo Governorate 4731130",lat:30.02886071407647,lng:31.426460323294073},
@@ -32,6 +55,7 @@ function calculateDistance(lat1,lon1,lat2,lon2){
   const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
   return R*c;
 }
+
 async function fetchDrivingDistance(userLoc,school){
   const url=`https://router.project-osrm.org/route/v1/driving/${userLoc.lng},${userLoc.lat};${school.lng},${school.lat}?overview=false&alternatives=false&steps=false`;
   const res=await fetch(url);
@@ -40,6 +64,7 @@ async function fetchDrivingDistance(userLoc,school){
   if(json&&json.routes&&json.routes.length>0){return json.routes[0].distance/1000;}
   throw new Error('No route found');
 }
+
 function getUserLocation(){
   return new Promise((resolve,reject)=>{
     if(navigator.geolocation){
@@ -51,40 +76,31 @@ function getUserLocation(){
   });
 }
 
-async function init(){
+async function renderSchools(){
   const schoolsListDiv=document.getElementById("schools-list");
-  let userLocation={lat:30.0444,lng:31.2357};
-  try{userLocation=await getUserLocation();}catch(err){
-    schoolsListDiv.innerHTML="<p style='text-align:center;color:#888'>Couldn't get your location. Showing straight-line distances from Cairo center. Click \"Get driving distance\" for driving.</p>";
-  }
-
-  const map=L.map('map').setView([userLocation.lat,userLocation.lng],7);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
-  L.marker([userLocation.lat,userLocation.lng]).addTo(map).bindPopup("Your Location").openPopup();
-
   schoolsData.forEach(s=>{
-    s.distance=calculateDistance(userLocation.lat,userLocation.lng,s.lat,s.lng);
+    s.distance=calculateDistance(window.userLoc.lat,window.userLoc.lng,s.lat,s.lng);
     s.gm_link=`https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`;
   });
   schoolsData.sort((a,b)=>(a.distance||Infinity)-(b.distance||Infinity));
   schoolsListDiv.innerHTML='';
   schoolsData.forEach((s,idx)=>{
-    L.marker([s.lat,s.lng]).addTo(map).bindPopup(`<b>${s.name}</b><br>${s.address}`);
+    L.marker([s.lat,s.lng]).addTo(window.map).bindPopup(`<b>${s.name}</b><br>${s.address}`);
     const card=document.createElement('div');
     card.className='school-item';
     const distText=isFinite(s.distance)?`${s.distance.toFixed(2)} km (straight-line)`:'Distance unknown';
     card.innerHTML=`
       <h3>${s.name}</h3>
-      <p><i class="fa-solid fa-location-dot"></i> ${s.address}</p>
-      <p id="dist-${idx}"><i class="fa-solid fa-road"></i> ${distText}</p>
-      <a href="${s.gm_link}" target="_blank"><i class="fa-solid fa-map-location-dot"></i> Open in Google Maps</a>
-      <button id="drive-btn-${idx}"><i class="fa-solid fa-car"></i> Get driving distance</button>`;
+      <p><i class="fa-solid fa-location-dot"></i> ${t('address')}: ${s.address}</p>
+      <p id="dist-${idx}"><i class="fa-solid fa-road"></i> ${t('distance')}: ${distText}</p>
+      <a href="${s.gm_link}" target="_blank"><i class="fa-solid fa-map-location-dot"></i> ${t('openMap')}</a>
+      <button id="drive-btn-${idx}"><i class="fa-solid fa-car"></i> ${t('driving')}</button>`;
     schoolsListDiv.appendChild(card);
     document.getElementById(`drive-btn-${idx}`).addEventListener('click',async()=>{
       const distEl=document.getElementById(`dist-${idx}`);
-      distEl.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> calculating driving distance...';
+      distEl.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> ...';
       try{
-        const driveKm=await fetchDrivingDistance(userLocation,s);
+        const driveKm=await fetchDrivingDistance(window.userLoc,s);
         distEl.innerHTML=`<i class="fa-solid fa-car"></i> ${driveKm.toFixed(2)} km (driving) — ${s.distance.toFixed(2)} km (straight-line)`;
       }catch(err){
         distEl.innerHTML=`<i class="fa-solid fa-road"></i> ${s.distance.toFixed(2)} km (straight-line) — driving distance unavailable`;
@@ -92,5 +108,27 @@ async function init(){
     });
   });
 }
-init();
 
+async function init(){
+  document.getElementById('title').textContent=t('title');
+  if(currentLang==='ar'){document.body.setAttribute('dir','rtl');}else{document.body.setAttribute('dir','ltr');}
+
+  try{window.userLoc=await getUserLocation();}
+  catch(err){
+    window.userLoc={lat:30.0444,lng:31.2357};
+    document.getElementById("schools-list").innerHTML="<p style='text-align:center;color:#888'>"+(currentLang==='ar'?"لم نتمكن من تحديد موقعك":"Couldn't get your location")+"</p>";
+  }
+
+  window.map=L.map('map').setView([window.userLoc.lat,window.userLoc.lng],7);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(window.map);
+  L.marker([window.userLoc.lat,window.userLoc.lng]).addTo(window.map).bindPopup(t('yourLoc')).openPopup();
+
+  renderSchools();
+}
+
+document.getElementById('lang-select').addEventListener('change',e=>{
+  currentLang=e.target.value;
+  init();
+});
+
+init();
