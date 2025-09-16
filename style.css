@@ -104,19 +104,19 @@ main {
 @media (max-width: 768px) {
   main {
     flex-direction: column;
-    height: auto;
+    height: calc(100vh - 150px); /* كل المساحة بعد الهيدر */
   }
 
   #map {
     width: 100%;
-    height: 400px; /* ارتفاع أكبر للخرطة */
-    margin-bottom: 10px;
+    height: 50%; /* النصف العلوى */
+    margin: 0;
   }
 
   #schools-list {
     width: 100%;
-    max-height: none;
-    overflow-y: visible;
+    height: 50%; /* النصف السفلى */
+    overflow-y: auto; /* سكرول لو طويل */
     padding: 8px;
   }
 
@@ -130,6 +130,6 @@ main {
     justify-content: center;
     font-size: 0.9rem;
     padding: 10px;
-    border-radius: 12px; /* شكل Rounded أكبر */
+    border-radius: 12px;
   }
 }
