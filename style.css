@@ -32,7 +32,7 @@ header small {
 
 main {
   display: flex;
-  flex-direction: row; /* دايما صفين على الكمبيوتر */
+  flex-direction: row;
   height: calc(100vh - 80px);
 }
 
@@ -73,13 +73,13 @@ main {
   text-decoration: none;
 }
 
-/* الزرين الجديدين */
+/* الزرين */
 .school-item .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  width: 48%; /* على الكمبيوتر */
+  width: 48%;
   margin-top: 6px;
   padding: 8px;
   background: linear-gradient(135deg, #007bff, #0056b3);
@@ -134,7 +134,8 @@ body[dir="rtl"] header {
 /* تحسين المظهر على الشاشات الصغيرة */
 @media (max-width: 768px) {
   main {
-    flex-direction: column; /* على الموبايل الخريطة فوق والقائمة تحت */
+    flex-direction: column;
+    height: auto;
   }
   #map {
     height: 300px;
@@ -149,7 +150,6 @@ body[dir="rtl"] header {
   .school-item h3 {
     font-size: 0.95rem;
   }
-  /* على الموبايل كل زر ياخد سطر كامل */
   .school-item .btn {
     width: 100%;
     margin-left: 0 !important;
