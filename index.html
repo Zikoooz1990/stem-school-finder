@@ -16,10 +16,13 @@
 </head>
 <body>
   <header>
-    <h1 id="title">STEM Schools Nearby</h1>
+    <div>
+      <h1 id="title">STEM Schools Nearby</h1>
+      <small id="madeby">made with ❤️ by ZIKO</small>
+    </div>
     <select id="lang-select">
       <option value="en">English</option>
-      <option value="ar">العربية</option>
+      <option value="ar">المصرى</option>
     </select>
   </header>
 
@@ -27,6 +30,9 @@
     <div id="map"></div>
     <div id="schools-list"></div>
   </main>
+
+  <!-- زرار تحديد الموقع -->
+  <button id="locate-btn" class="locate-btn">📍 <span id="locate-text">Locate me</span></button>
 
   <!-- Leaflet JS من فولدر dist -->
   <script src="dist/leaflet.js"></script>
