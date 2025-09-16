@@ -142,7 +142,8 @@ function getUserLocation() {
                     });
                 },
                 (error) => {
-                    reject(new Error("Geolocation is denied. Please enable location services."));
+                    // Reject the promise with a descriptive error message
+                    reject(new Error("Unable to retrieve your location. Check your browser settings and try again."));
                 }
             );
         } else {
@@ -166,6 +167,8 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
 // The main function that orchestrates everything
 async function init() {
+    const schoolsListDiv = document.getElementById("schools-list");
+
     try {
         const userLocation = await getUserLocation();
         
@@ -193,16 +196,24 @@ async function init() {
             );
         });
         schoolsData.sort((a, b) => a.distance - b.distance);
+        
+        // The list is now ready to be displayed
+        schoolsListDiv.innerHTML = ''; // Clear the "Loading" message
 
-        // Display schools on the map and in the list
-        const schoolsListDiv = document.getElementById("schools-list");
-        schoolsListDiv.innerHTML = ''; // Clear loading message
+    } catch (error) {
+        console.error("Error:", error);
+        // Display the error message to the user
+        schoolsListDiv.innerHTML = `<p>Error: ${error.message}</p>`;
 
+    } finally {
+        // This block will always run, ensuring the list is populated regardless of errors
         schoolsData.forEach(school => {
             // Add a marker to the map for each school
-            L.marker([school.lat, school.lng])
-                .addTo(map)
-                .bindPopup(`<b>${school.name}</b><br>${school.address}`);
+            if (map) { // Only add markers if the map was successfully initialized
+                L.marker([school.lat, school.lng])
+                    .addTo(map)
+                    .bindPopup(`<b>${school.name}</b><br>${school.address}`);
+            }
 
             // Create and add the list item for each school
             const schoolItem = document.createElement("div");
@@ -210,14 +221,10 @@ async function init() {
             schoolItem.innerHTML = `
                 <h3>${school.name}</h3>
                 <p>Address: ${school.address}</p>
-                <p>Distance: ${school.distance.toFixed(2)} km</p>
+                <p>Distance: ${school.distance ? school.distance.toFixed(2) + ' km' : 'Distance unknown'}</p>
             `;
             schoolsListDiv.appendChild(schoolItem);
         });
-
-    } catch (error) {
-        console.error("Error:", error);
-        document.getElementById("schools-list").innerHTML = `<p>Error: ${error.message}</p>`;
     }
 }
 
