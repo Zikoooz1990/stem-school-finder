@@ -1,26 +1,25 @@
-// translations
 const translations = {
   en: {
     title: "STEM Schools Nearby",
     made: "made with ❤️ by ZIKO",
     address: "Address",
     distance: "Distance",
-    driving: "Get driving distance",
-    route: "Show Route",
-    openMap: "Open in Google Maps",
+    driving: "🚗 Get driving distance",
+    route: "🛣️ Show Route",
+    openMap: "🌍 Open in Google Maps",
     yourLoc: "Your Location",
-    locate: "Locate me"
+    locate: "📍 Locate me"
   },
   ar: {
     title: "مدارس المتفوقين القريبة",
     made: "معمول بحب ❤️ بواسطة ZIKO",
     address: "العنوان",
     distance: "المسافة",
-    driving: "احسب مسافة السواقة",
-    route: "اظهر الطريق",
-    openMap: "افتح على خرائط جوجل",
+    driving: "🚗 احسب مسافة السواقة",
+    route: "🛣️ اظهر الطريق",
+    openMap: "🌍 افتح على خرائط جوجل",
     yourLoc: "موقعك",
-    locate: "حدد موقعى"
+    locate: "📍 حدد موقعى"
   }
 };
 let currentLang='en';
@@ -84,7 +83,6 @@ async function renderSchools(){
   list.innerHTML='';
   schoolsData.forEach((s,i)=>{
     L.marker([s.lat,s.lng]).addTo(window.map).bindPopup(`<b>${s.name}</b><br>${s.address}`);
-
     const card=document.createElement('div');
     card.className='school-item';
     card.innerHTML=`
@@ -92,19 +90,19 @@ async function renderSchools(){
       <p>${t('address')}: ${s.address}</p>
       <p id="dist-${i}">${t('distance')}: ${s.distance.toFixed(2)} km</p>
       <a href="${s.gm_link}" target="_blank">${t('openMap')}</a><br>
-      <button class="btn" id="drive-${i}"><i class="fa-solid fa-car"></i> ${t('driving')}</button>
-      <button class="btn" id="route-${i}"><i class="fa-solid fa-route"></i> ${t('route')}</button>
+      <button class="btn" id="drive-${i}">${t('driving')}</button>
+      <button class="btn" id="route-${i}">${t('route')}</button>
     `;
     list.appendChild(card);
 
     document.getElementById(`drive-${i}`).addEventListener('click',async()=>{
       const el=document.getElementById(`dist-${i}`);
-      el.innerHTML='<div style="background:#007bff;color:#fff;padding:6px;border-radius:4px;display:inline-block;">…</div>';
+      el.textContent='…';
       try{
         const km=await fetchDrivingDistance(window.userLoc,s);
-        el.innerHTML=`<div style="background:#007bff;color:#fff;padding:6px;border-radius:4px;display:inline-block;">${t('distance')}: ${km.toFixed(2)} km (driving)</div>`;
+        el.textContent=`${t('distance')}: ${km.toFixed(2)} km (driving)`;
       }catch{
-        el.innerHTML=`<div style="background:#007bff;color:#fff;padding:6px;border-radius:4px;display:inline-block;">${t('distance')}: ${s.distance.toFixed(2)} km</div>`;
+        el.textContent=`${t('distance')}: ${s.distance.toFixed(2)} km`;
       }
     });
 
@@ -142,7 +140,7 @@ document.getElementById('locate-btn').addEventListener('click',async()=>{
     window.userLoc=await getUserLocation();
     userMarker.setLatLng([window.userLoc.lat,window.userLoc.lng]);
     window.map.setView([window.userLoc.lat,window.userLoc.lng],12);
-  }catch{alert('تعذر تحديد موقعك');}
+  }catch{alert(currentLang==='ar'?'تعذر تحديد موقعك':'Could not get location');}
 });
 document.getElementById('lang-select').addEventListener('change',e=>{currentLang=e.target.value;window.map.remove();init();});
 init();
