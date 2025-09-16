@@ -2,25 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Egypt STEM Schools</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>STEM Schools Egypt</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+rqkO/6f3ZnWuk4rpnJdA8mH3z6k9hbScEarsv3XU=" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1jOizkG7ntpV7ylFyB1W3wD4O7uoNIG7r4yef9jI=" crossorigin=""></script>
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
   <header>
-    <h1><i class="fa-solid fa-flask"></i> Egypt STEM Schools</h1>
+    <h1 id="title">STEM Schools Nearby</h1>
+    <select id="lang-select">
+      <option value="en">English</option>
+      <option value="ar">العربية</option>
+    </select>
   </header>
+
   <main>
     <div id="map"></div>
-    <div id="schools-container">
-      <h2>Schools Nearby</h2>
-      <div id="schools-list"></div>
-    </div>
+    <div id="schools-list"></div>
   </main>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
   <script src="script.js"></script>
 </body>
 </html>
