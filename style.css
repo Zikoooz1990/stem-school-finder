@@ -1,63 +1,101 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background-color: #f4f4f4;
-    color: #333;
+  margin: 0;
+  font-family: 'Cairo', sans-serif;
+  background-color: #f5f6fa;
+  color: #333;
 }
 
 header {
-    text-align: center;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  background: #2d89ef;
+  color: white;
+  padding: 1rem 2rem;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-h1 {
-    color: #4CAF50;
-    margin: 0;
-}
-
-p {
-    color: #777;
+header h1 {
+  margin: 0;
+  font-size: 1.8rem;
 }
 
 main {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+  display: flex;
+  height: calc(100vh - 70px);
 }
 
 #map {
-    height: 50vh; /* Takes up half of the viewport height */
-    width: 100%;
-    z-index: 1; /* Ensures the map is above the list in case of overlap */
+  flex: 2;
+  height: 100%;
+}
+
+#schools-container {
+  flex: 1;
+  overflow-y: auto;
+  background: #ffffff;
+  padding: 1rem;
+  box-shadow: -2px 0 4px rgba(0,0,0,0.1);
+}
+
+#schools-container h2 {
+  margin-top: 0;
+  text-align: center;
+  color: #2d89ef;
 }
 
 #schools-list {
-    flex-grow: 1; /* Takes up the remaining vertical space */
-    padding: 20px;
-    overflow-y: auto; /* Adds a scrollbar if the content is too long */
-    background-color: #f9f9f9;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
 }
 
 .school-item {
-    padding: 15px;
-    margin-bottom: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform .2s, box-shadow .2s;
+}
+
+.school-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .school-item h3 {
-    margin: 0 0 5px;
-    color: #007BFF;
+  margin: 0 0 0.5rem 0;
+  color: #2d89ef;
+  font-size: 1.1rem;
 }
 
 .school-item p {
-    margin: 0;
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+}
+
+.school-item a {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background: #2d89ef;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.school-item a:hover {
+  background: #1d5fbf;
+}
+
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+  }
+  #map {
+    height: 300px;
+  }
+  #schools-container {
+    height: auto;
+    box-shadow: none;
+  }
 }

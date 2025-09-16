@@ -1,27 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STEM School Finder</title>
-    <link rel="stylesheet" href="style.css">
-    
-    <link rel="stylesheet" href="dist/leaflet.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Egypt STEM Schools</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>Find STEM Schools Near You</h1>
-        <p>Loading your location and school data...</p>
-    </header>
-
-    <main>
-        <div id="map"></div>
-        
-        <div id="schools-list"></div>
-    </main>
-
-    <script src="dist/leaflet.js"></script>
-    
-    <script src="script.js"></script>
+  <header>
+    <h1><i class="fa-solid fa-flask"></i> Egypt STEM Schools</h1>
+  </header>
+  <main>
+    <div id="map"></div>
+    <div id="schools-container">
+      <h2>Schools Nearby</h2>
+      <div id="schools-list"></div>
+    </div>
+  </main>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
