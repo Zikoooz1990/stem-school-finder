@@ -62,7 +62,9 @@ main {
   color: #007bff;
 }
 
-.school-item p, .school-item a, .school-item button {
+.school-item p,
+.school-item a,
+.school-item button {
   font-size: 0.9rem;
   margin: 3px 0;
 }
@@ -72,15 +74,19 @@ main {
   text-decoration: none;
 }
 
+/* زرار مسافة السواقة */
 .school-item button {
-  display: inline-block;
-  margin-top: 4px;
-  padding: 5px 10px;
+  display: block;              /* ياخد صف لوحده */
+  width: 100%;                 /* يعرض على كل عرض الكارت */
+  margin-top: 6px;
+  padding: 8px;
   background: #007bff;
   color: #fff;
   border: none;
   border-radius: 5px;
+  font-size: 0.9rem;
   cursor: pointer;
+  text-align: center;
 }
 
 .school-item button:hover {
@@ -100,6 +106,7 @@ main {
   cursor: pointer;
 }
 
+/* اتجاه النصوص */
 body[dir="rtl"] {
   direction: rtl;
   text-align: right;
@@ -109,6 +116,7 @@ body[dir="rtl"] header {
   flex-direction: row-reverse;
 }
 
+/* تحسين المظهر على الشاشات الصغيرة */
 @media (max-width: 768px) {
   main {
     flex-direction: column;
@@ -119,5 +127,11 @@ body[dir="rtl"] header {
   #schools-list {
     height: auto;
     flex: none;
+  }
+  header h1 {
+    font-size: 1.1rem;
+  }
+  .school-item h3 {
+    font-size: 0.95rem;
   }
 }
