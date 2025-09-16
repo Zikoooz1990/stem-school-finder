@@ -63,8 +63,7 @@ main {
 }
 
 .school-item p,
-.school-item a,
-.school-item button {
+.school-item a {
   font-size: 0.9rem;
   margin: 3px 0;
 }
@@ -74,28 +73,41 @@ main {
   text-decoration: none;
 }
 
-/* الزرين جنب بعض */
-.school-item button {
-  display: inline-block;
+/* الزرين الجديدين */
+.school-item .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   width: 48%;
   margin-top: 6px;
   padding: 8px;
-  background: #007bff;
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: #fff;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
   text-align: center;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
 }
-.school-item button + button {
+
+.school-item .btn:hover {
+  background: linear-gradient(135deg, #0056b3, #007bff);
+  transform: translateY(-2px);
+}
+
+.school-item .btn i {
+  font-size: 1rem;
+}
+
+.school-item .btn + .btn {
   margin-left: 4%;
 }
 
-.school-item button:hover {
-  background: #0056b3;
-}
-
+/* زرار تحديد الموقع */
 .locate-btn {
   position: fixed;
   bottom: 20px;
@@ -114,12 +126,9 @@ body[dir="rtl"] {
   direction: rtl;
   text-align: right;
 }
+
 body[dir="rtl"] header {
   flex-direction: row-reverse;
-}
-body[dir="rtl"] .school-item button + button {
-  margin-left: 0;
-  margin-right: 4%;
 }
 
 /* تحسين المظهر على الشاشات الصغيرة */
@@ -139,5 +148,9 @@ body[dir="rtl"] .school-item button + button {
   }
   .school-item h3 {
     font-size: 0.95rem;
+  }
+  .school-item .btn {
+    width: 100%;
+    margin-left: 0 !important;
   }
 }
