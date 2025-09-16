@@ -1,5 +1,7 @@
-// Data for STEM schools in Egypt
+// Improved script.js -- fixed distance logic, coord validation and optional driving distances via OSRM
+
 const schoolsData = [
+  /* Paste your schools array here (unchanged) */
   {
     name: "STEM High School – Maadi",
     address: "X876+FH9, Maadi as Sarayat Al Gharbeyah, Tura, Cairo Governorate 4064145",
@@ -129,104 +131,177 @@ const schoolsData = [
 ];
 
 let map;
+let CURRENT_USER_LOCATION = null;
 
-// This function gets the user's location using the browser's Geolocation API
-function getUserLocation() {
-    return new Promise((resolve, reject) => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    resolve({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    });
-                },
-                (error) => {
-                    // Reject the promise with a descriptive error message
-                    reject(new Error("Unable to retrieve your location. Check your browser settings and try again."));
-                }
-            );
-        } else {
-            reject(new Error("Geolocation is not supported by this browser."));
-        }
-    });
+// Helpers
+function toRadians(deg) {
+  return deg * Math.PI / 180;
 }
 
-// This function calculates the distance between two points on Earth
+function isValidEgyptCoord(lat, lng) {
+  // Loose bounding box for Egypt
+  return lat >= 20 && lat <= 33 && lng >= 24 && lng <= 37.5;
+}
+
+// Haversine (great-circle) distance in kilometers
 function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radius of the earth in km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
+  if (
+    typeof lat1 !== "number" ||
+    typeof lon1 !== "number" ||
+    typeof lat2 !== "number" ||
+    typeof lon2 !== "number" ||
+    isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)
+  ) {
+    return Infinity;
+  }
+
+  const R = 6371; // km
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+            Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
 }
 
-// The main function that orchestrates everything
-async function init() {
-    const schoolsListDiv = document.getElementById("schools-list");
-
-    try {
-        const userLocation = await getUserLocation();
-        
-        // Initialize the Leaflet map and set the view
-        map = L.map('map').setView([userLocation.lat, userLocation.lng], 12);
-
-        // Add the OpenStreetMap tile layer (the actual map image)
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
-
-        // Add a marker for the user's location
-        L.marker([userLocation.lat, userLocation.lng])
-            .addTo(map)
-            .bindPopup("Your Location")
-            .openPopup();
-
-        // Calculate and sort the schools by distance
-        schoolsData.forEach(school => {
-            school.distance = calculateDistance(
-                userLocation.lat,
-                userLocation.lng,
-                school.lat,
-                school.lng
-            );
-        });
-        schoolsData.sort((a, b) => a.distance - b.distance);
-        
-        // The list is now ready to be displayed
-        schoolsListDiv.innerHTML = ''; // Clear the "Loading" message
-
-    } catch (error) {
-        console.error("Error:", error);
-        // Display the error message to the user
-        schoolsListDiv.innerHTML = `<p>Error: ${error.message}</p>`;
-
-    } finally {
-        // This block will always run, ensuring the list is populated regardless of errors
-        schoolsData.forEach(school => {
-            // Add a marker to the map for each school
-            if (map) { // Only add markers if the map was successfully initialized
-                L.marker([school.lat, school.lng])
-                    .addTo(map)
-                    .bindPopup(`<b>${school.name}</b><br>${school.address}`);
-            }
-
-            // Create and add the list item for each school
-            const schoolItem = document.createElement("div");
-            schoolItem.className = "school-item";
-            schoolItem.innerHTML = `
-                <h3>${school.name}</h3>
-                <p>Address: ${school.address}</p>
-                <p>Distance: ${school.distance ? school.distance.toFixed(2) + ' km' : 'Distance unknown'}</p>
-            `;
-            schoolsListDiv.appendChild(schoolItem);
-        });
+// Try to fix swapped coords (lat/lng) if they appear outside Egypt bounds
+function normalizeSchoolCoords(school) {
+  if (!isValidEgyptCoord(school.lat, school.lng)) {
+    // try swap
+    if (isValidEgyptCoord(school.lng, school.lat)) {
+      // swap and log to console
+      console.warn(`Swapping lat/lng for ${school.name} because they were outside Egypt bounds.`);
+      const tmp = school.lat;
+      school.lat = school.lng;
+      school.lng = tmp;
+      school._coordsFixed = true;
+    } else {
+      console.warn(`Coordinates for ${school.name} look invalid or outside Egypt bounds:`, school.lat, school.lng);
+      school._coordsFixed = false;
     }
+  } else {
+    school._coordsFixed = true;
+  }
+  return school;
 }
 
-// Run the main function when the page loads
+// Fetch driving distance from OSRM (returns km) - on demand
+async function fetchDrivingDistance(userLoc, school) {
+  // OSRM expects lon,lat pairs
+  const base = 'https://router.project-osrm.org/route/v1/driving';
+  const coords = `${userLoc.lng},${userLoc.lat};${school.lng},${school.lat}`;
+  const url = `${base}/${coords}?overview=false&alternatives=false&steps=false`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('OSRM request failed');
+    const json = await res.json();
+    if (json && json.routes && json.routes.length > 0) {
+      const meters = json.routes[0].distance;
+      return meters / 1000; // km
+    } else {
+      throw new Error('No route found');
+    }
+  } catch (err) {
+    console.warn('OSRM error or blocked by CORS:', err);
+    throw err;
+  }
+}
+
+// get user location with Promise
+function getUserLocation() {
+  return new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        err => reject(err),
+        { maximumAge: 60_000, timeout: 10_000 }
+      );
+    } else {
+      reject(new Error("Geolocation not supported"));
+    }
+  });
+}
+
+async function init() {
+  const schoolsListDiv = document.getElementById("schools-list");
+  // default to Cairo center if user denies
+  let userLocation = { lat: 30.0444, lng: 31.2357 };
+  let usedDefault = true;
+
+  try {
+    const loc = await getUserLocation();
+    userLocation = loc;
+    usedDefault = false;
+    CURRENT_USER_LOCATION = loc;
+  } catch (err) {
+    console.warn("Couldn't get user location, using default center (Cairo).", err);
+    CURRENT_USER_LOCATION = userLocation;
+    schoolsListDiv.innerHTML = `<p>Couldn't get your location (or permission denied). Showing distances from Cairo center (straight-line). If you want driving distances, click the 'Driving distance' button for a school.</p>`;
+  }
+
+  // Initialize the Leaflet map
+  map = L.map('map').setView([userLocation.lat, userLocation.lng], 7);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // mark user
+  L.marker([userLocation.lat, userLocation.lng]).addTo(map).bindPopup(usedDefault ? "Default center (Cairo)" : "Your Location").openPopup();
+
+  // normalize coords and compute distances
+  schoolsData.forEach(school => {
+    normalizeSchoolCoords(school);
+    school.distance = calculateDistance(userLocation.lat, userLocation.lng, school.lat, school.lng);
+    // store a Google Maps quick link
+    school.gm_link = `https://www.google.com/maps/search/?api=1&query=${school.lat},${school.lng}`;
+  });
+
+  // sort by numeric distance
+  schoolsData.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+
+  // clear and render
+  schoolsListDiv.innerHTML = '';
+  schoolsData.forEach((school, idx) => {
+    // add marker for each school
+    if (map) {
+      L.marker([school.lat, school.lng]).addTo(map).bindPopup(`<b>${school.name}</b><br>${school.address}`);
+    }
+
+    // create item
+    const schoolItem = document.createElement("div");
+    schoolItem.className = "school-item";
+
+    // distance text (straight-line)
+    const distanceText = isFinite(school.distance) ? `${school.distance.toFixed(2)} km (straight-line)` : 'Distance unknown';
+
+    schoolItem.innerHTML = `
+      <h3>${school.name}</h3>
+      <p>Address: ${school.address}</p>
+      <p id="dist-${idx}">Distance: ${distanceText}</p>
+      <p>
+        <a href="${school.gm_link}" target="_blank" rel="noopener">Open in Google Maps</a>
+        &nbsp;|&nbsp;
+        <button id="drive-btn-${idx}">Get driving distance</button>
+      </p>
+    `;
+
+    schoolsListDiv.appendChild(schoolItem);
+
+    // attach driving distance handler
+    const btn = document.getElementById(`drive-btn-${idx}`);
+    btn.addEventListener('click', async () => {
+      const distEl = document.getElementById(`dist-${idx}`);
+      distEl.textContent = 'Distance: calculating driving distance...';
+      try {
+        const driveKm = await fetchDrivingDistance(CURRENT_USER_LOCATION, school);
+        distEl.textContent = `Distance: ${driveKm.toFixed(2)} km (driving) — ${school.distance.toFixed(2)} km (straight-line)`;
+      } catch (err) {
+        distEl.textContent = `Distance: ${school.distance ? school.distance.toFixed(2) + ' km (straight-line)' : 'unknown'} (driving distance unavailable)`;
+      }
+    });
+  });
+}
+
+// start
 init();
