@@ -1,135 +1,84 @@
-* {
-  box-sizing: border-box;
-}
-
-body {
+/* Basic resets */
+body, html {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #f9f9f9;
-  color: #333;
+  padding: 0;
+  font-family: Arial, sans-serif;
 }
 
 header {
-  text-align: center;
   padding: 10px;
-  background: #007bff;
-  color: #fff;
+  background: #004aad;
+  color: white;
+  text-align: center;
 }
 
-header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-}
-
-header p {
-  margin: 4px 0;
-}
-
-.controls {
-  margin-top: 8px;
+.top-bar {
   display: flex;
   justify-content: center;
   gap: 10px;
-}
-
-.btn {
-  background: linear-gradient(45deg, #007bff, #00b4ff);
-  color: #fff;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-width: 150px;
-  text-align: center;
-  transition: transform .2s, box-shadow .2s;
-}
-
-.btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-main {
-  display: flex;
-  flex-direction: row;
-  height: calc(100vh - 150px);
+  margin-top: 5px;
 }
 
 #map {
-  flex: 1;
-  height: 100%;
+  width: 100%;
+  height: 50vh; /* half screen on mobile */
 }
 
 #schools-list {
-  flex: 1;
+  width: 100%;
+  height: 50vh; /* half screen on mobile */
   overflow-y: auto;
+  background: #f9f9f9;
   padding: 10px;
-  background: #f1f1f1;
 }
 
 .school-item {
-  background: #fff;
-  border-radius: 8px;
+  background: #ffffff;
+  border-radius: 10px;
   padding: 10px;
   margin-bottom: 10px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .school-item h3 {
-  margin-top: 0;
-  color: #007bff;
-  font-size: 1rem;
+  margin: 0 0 5px 0;
+  font-size: 1.1em;
 }
 
 .school-item p {
-  margin: 5px 0;
-  font-size: 0.9rem;
+  margin: 4px 0;
+  font-size: 0.9em;
 }
 
-.school-item a {
-  color: #007bff;
-  text-decoration: none;
+.school-item .btn {
+  display: inline-block;
+  margin: 4px 2px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  background: #004aad;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9em;
 }
 
-.school-item a:hover {
-  text-decoration: underline;
+.school-item .btn:hover {
+  background: #0060d1;
 }
 
-/* شكل الموبايل */
-@media (max-width: 768px) {
+/* Desktop layout: map and list side by side */
+@media(min-width: 768px){
   main {
-    flex-direction: column;
-    height: calc(100vh - 150px); /* كل المساحة بعد الهيدر */
+    display: flex;
+    flex-direction: row;
   }
-
+  #map, #schools-list {
+    height: calc(100vh - 120px);
+  }
   #map {
-    width: 100%;
-    height: 50%; /* النصف العلوى */
-    margin: 0;
+    width: 50%;
   }
-
   #schools-list {
-    width: 100%;
-    height: 50%; /* النصف السفلى */
-    overflow-y: auto; /* سكرول لو طويل */
-    padding: 8px;
-  }
-
-  .school-item {
-    padding: 8px;
-    margin-bottom: 8px;
-  }
-
-  .btn {
-    width: 100%; /* الأزرار عريضة على الموبايل */
-    justify-content: center;
-    font-size: 0.9rem;
-    padding: 10px;
-    border-radius: 12px;
+    width: 50%;
   }
 }
