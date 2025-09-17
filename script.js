@@ -93,9 +93,10 @@ async function init(){
     loc={lat:pos.coords.latitude,lng:pos.coords.longitude};
   }catch(e){console.warn('Using Cairo center');}
   window.userLoc=loc;
-  map=L.map('map').setView([loc.lat,loc.lng],7);
-  L.tileLayer('dist/leaflet/tiles/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
-  userMarker=L.marker([loc.lat,loc.lng]).addTo(map).bindPopup('📍 موقعك').openPopup();
+  map = L.map('map').setView([loc.lat, loc.lng], 7);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map).bindPopup('📍 موقعك').openPopup();
   renderSchools();
 }
 
@@ -157,3 +158,4 @@ function renderSchools(){
 document.getElementById('gender-filter').addEventListener('change',renderSchools);
 document.getElementById('locate-btn').addEventListener('click',init);
 init();
+
