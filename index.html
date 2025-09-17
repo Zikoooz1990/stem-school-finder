@@ -1,24 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>STEM Schools</title>
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="dist/leaflet.css">
-  <!-- Your CSS -->
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>مدارس STEM Egypt</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Leaflet local (تأكد من وجود dist/leaflet/ ) -->
+  <link rel="stylesheet" href="dist/leaflet.css">
+  <script src="dist/leaflet.js"></script>
 </head>
 <body>
   <header>
-    <h1 id="title"></h1>
-    <p id="madeby"></p>
-    <div class="top-bar">
+    <h1>❤️ Made with love by ZIKO</h1>
+    <div class="controls">
       <select id="lang-select">
-        <option value="en">English</option>
-        <option value="ar">العربية</option>
+        <option value="ar">🇪🇬 عربي</option>
+        <option value="en">🇬🇧 English</option>
       </select>
-      <button id="locate-btn"><span id="locate-text"></span></button>
+      <select id="gender-filter">
+        <option value="all">🏫 جميع المدارس</option>
+        <option value="boys">👦 مدارس البنين</option>
+        <option value="girls">👧 مدارس البنات</option>
+      </select>
+      <button id="locate-btn">📍 موقعي الحالى</button>
     </div>
   </header>
 
@@ -27,9 +31,6 @@
     <div id="schools-list"></div>
   </main>
 
-  <!-- Leaflet JS -->
-  <script src="dist/leaflet.js"></script>
-  <!-- Your Script -->
-  <script src="script.js" defer></script>
+  <script src="script.js"></script>
 </body>
 </html>
