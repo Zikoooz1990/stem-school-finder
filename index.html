@@ -1,37 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>STEM Schools</title>
-  <!-- Leaflet CSS from your local dist folder -->
-  <link rel="stylesheet" href="dist/leaflet.css" />
-  <!-- Your style -->
-  <link rel="stylesheet" href="style.css" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="dist/leaflet.css">
+  <!-- Your CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1 id="title">STEM Schools Nearby</h1>
-    <p id="madeby">made with ❤️ by ZIKO</p>
+    <h1 id="title"></h1>
+    <p id="madeby"></p>
     <div class="top-bar">
       <select id="lang-select">
         <option value="en">English</option>
         <option value="ar">العربية</option>
       </select>
-      <button id="locate-btn"><span id="locate-text">📍 Locate me</span></button>
+      <button id="locate-btn"><span id="locate-text"></span></button>
     </div>
   </header>
 
   <main>
-    <!-- Map half -->
     <div id="map"></div>
-    <!-- Schools list half -->
     <div id="schools-list"></div>
   </main>
 
-  <!-- Leaflet JS from your local dist folder -->
+  <!-- Leaflet JS -->
   <script src="dist/leaflet.js"></script>
-  <!-- Your script -->
-  <script src="script.js"></script>
+  <!-- Your Script -->
+  <script src="script.js" defer></script>
 </body>
 </html>
