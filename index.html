@@ -1,31 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>STEM Schools</title>
-  <!-- Leaflet CSS محلى من dist -->
-  <link rel="stylesheet" href="dist/leaflet.css">
-  <link rel="stylesheet" href="style.css">
+  <!-- Leaflet CSS from your local dist folder -->
+  <link rel="stylesheet" href="dist/leaflet.css" />
+  <!-- Your style -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
     <h1 id="title">STEM Schools Nearby</h1>
     <p id="madeby">made with ❤️ by ZIKO</p>
-    <div class="controls">
-      <button id="locate-btn" class="btn">📍 <span id="locate-text">Locate me</span></button>
+    <div class="top-bar">
       <select id="lang-select">
         <option value="en">English</option>
         <option value="ar">العربية</option>
       </select>
+      <button id="locate-btn"><span id="locate-text">📍 Locate me</span></button>
     </div>
   </header>
+
   <main>
+    <!-- Map half -->
     <div id="map"></div>
+    <!-- Schools list half -->
     <div id="schools-list"></div>
   </main>
-  <!-- Leaflet JS محلى من dist -->
+
+  <!-- Leaflet JS from your local dist folder -->
   <script src="dist/leaflet.js"></script>
+  <!-- Your script -->
   <script src="script.js"></script>
 </body>
 </html>
