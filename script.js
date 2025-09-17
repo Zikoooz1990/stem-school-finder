@@ -93,28 +93,41 @@ async function init(){
     loc={lat:pos.coords.latitude,lng:pos.coords.longitude};
   }catch(e){console.warn('Using Cairo center');}
   window.userLoc=loc;
-  map = L.map('map').setView([loc.lat, loc.lng], 7);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map).bindPopup('📍 موقعك').openPopup();
+
+  // Map with OSM tiles
+  map=L.map('map').setView([loc.lat,loc.lng],7);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // User marker
+  userMarker=L.marker([loc.lat,loc.lng]).addTo(map);
+  userMarker.bindPopup('📍 موقعك').openPopup();
+
   renderSchools();
 }
 
 function renderSchools(){
   const list=document.getElementById('schools-list');
   const selectedGender=document.getElementById('gender-filter').value;
+
   schoolsData.forEach(s=>{
     s.distance=calculateDistance(window.userLoc.lat,window.userLoc.lng,s.lat,s.lng);
     s.gm_link=`https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`;
   });
   schoolsData.sort((a,b)=>a.distance-b.distance);
-  const filtered=selectedGender==='all'?schoolsData:schoolsData.filter(s=>s.gender===selectedGender||s.gender==='mixed');
+  const filtered=selectedGender==='all'
+    ? schoolsData
+    : schoolsData.filter(s=>s.gender===selectedGender||s.gender==='mixed');
+
   list.innerHTML='';
   map.eachLayer(l=>{
     if(l instanceof L.Marker&&l!==userMarker)map.removeLayer(l);
   });
+
   filtered.forEach((s,i)=>{
     L.marker([s.lat,s.lng]).addTo(map).bindPopup(`<b>${s.name}</b><br>${s.address}`);
+
     const card=document.createElement('div');
     card.className='school-item';
     card.innerHTML=`
@@ -128,6 +141,7 @@ function renderSchools(){
       </div>
     `;
     list.appendChild(card);
+
     document.getElementById(`drive-${i}`).addEventListener('click',async()=>{
       const distEl=document.getElementById(`dist-${i}`);
       distEl.textContent='⏳ بيحسب...';
@@ -138,6 +152,7 @@ function renderSchools(){
         distEl.textContent=`${s.distance.toFixed(2)} كم (خط مستقيم) — (تعذر حساب السواقة)`;
       }
     });
+
     document.getElementById(`route-${i}`).addEventListener('click',async()=>{
       try{
         const base='https://router.project-osrm.org/route/v1/driving';
@@ -155,7 +170,7 @@ function renderSchools(){
     });
   });
 }
+
 document.getElementById('gender-filter').addEventListener('change',renderSchools);
 document.getElementById('locate-btn').addEventListener('click',init);
 init();
-
