@@ -149,5 +149,4 @@ document.getElementById('lang-select').addEventListener('change',e=>{
   init();
 });
 
-// التعديل المهم: نستنى تحميل الصفحة بالكامل
 window.addEventListener('load', init);
