@@ -22,10 +22,12 @@ const translations = {
     locate: "📍 حدد موقعى"
   }
 };
-let currentLang='en';
+
+// استرجع اللغة المحفوظة من localStorage لو موجودة
+let currentLang = localStorage.getItem('lang') || 'en';
 function t(k){return translations[currentLang][k];}
 
-// كل المدارس
+// كل المدارس (نفس اللى كان عندك)
 const schoolsData = [
   {name:"STEM High School – Maadi",address:"X876+FH9, Maadi as Sarayat Al Gharbeyah, Tura, Cairo Governorate 4064145",lat:29.963685859495783,lng:31.311470067023386},
   {name:"STEM High School – Nasr City",address:"2CHG+4RM, Nasr City, Cairo Governorate 4731130",lat:30.02886071407647,lng:31.426460323294073},
@@ -128,7 +130,24 @@ async function init(){
   document.getElementById('madeby').textContent=t('made');
   document.getElementById('locate-text').textContent=t('locate');
   document.body.setAttribute('dir',currentLang==='ar'?'rtl':'ltr');
-  try{window.userLoc=await getUserLocation();}catch{window.userLoc={lat:30.0444,lng:31.2357};}
+
+  // استرجع آخر موقع محفوظ
+  const savedLat=parseFloat(localStorage.getItem('lastLat'));
+  const savedLng=parseFloat(localStorage.getItem('lastLng'));
+
+  try{
+    window.userLoc=await getUserLocation();
+    // خزنه فى localStorage
+    localStorage.setItem('lastLat',window.userLoc.lat);
+    localStorage.setItem('lastLng',window.userLoc.lng);
+  }catch{
+    if(!isNaN(savedLat)&&!isNaN(savedLng)){
+      window.userLoc={lat:savedLat,lng:savedLng};
+    }else{
+      window.userLoc={lat:30.0444,lng:31.2357};
+    }
+  }
+
   window.map=L.map('map').setView([window.userLoc.lat,window.userLoc.lng],7);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(window.map);
   userMarker=L.marker([window.userLoc.lat,window.userLoc.lng]).addTo(window.map).bindPopup(t('yourLoc')).openPopup();
@@ -138,6 +157,8 @@ async function init(){
 document.getElementById('locate-btn').addEventListener('click',async()=>{
   try{
     window.userLoc=await getUserLocation();
+    localStorage.setItem('lastLat',window.userLoc.lat);
+    localStorage.setItem('lastLng',window.userLoc.lng);
     userMarker.setLatLng([window.userLoc.lat,window.userLoc.lng]);
     window.map.setView([window.userLoc.lat,window.userLoc.lng],12);
   }catch{alert(currentLang==='ar'?'تعذر تحديد موقعك':'Could not get location');}
@@ -145,8 +166,9 @@ document.getElementById('locate-btn').addEventListener('click',async()=>{
 
 document.getElementById('lang-select').addEventListener('change',e=>{
   currentLang=e.target.value;
+  localStorage.setItem('lang', currentLang);
   window.map.remove();
   init();
 });
 
-window.addEventListener('load', init);
+init();
